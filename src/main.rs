@@ -1,3 +1,4 @@
+use std::io;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
@@ -11,18 +12,21 @@ struct Cpu {
 }
 
 #[derive(Debug)]
+#[derive(Copy,Clone)]
 enum Register {
     A,
     B,
     C,
 }
 
+#[derive(Copy,Clone)]
 enum Operation {
     Set(Register, Value),
     Increment(Register),
     Decrement(Register),
 }
 
+#[derive(Copy,Clone)]
 enum Value {
     Immediate(u64),
     Register(Register),
@@ -42,9 +46,14 @@ fn main() {
         }
     }
 
-    for operation in codes {
-        cpu.apply(operation);
+    while let Ok(input) = fetch_line() {
+        if input == "s" {
+            let pc = cpu.pc;
+            let operation = codes[pc as usize];
+            cpu.apply(operation);
+        } else if input == "p" {
             println!("{:?}", cpu);
+        }
     }
 }
 
@@ -124,4 +133,19 @@ fn parse_line(line: &str) -> Result<Operation, ()> {
         },
         _ => Err(())
     }
+}
+
+fn fetch_line() -> io::Result<String> {
+    let mut input = String::new();
+
+    print!("> ");
+    try!(io::stdout().flush());
+
+    try!(io::stdin().read_line(&mut input));
+
+    // trim newline
+    let new_len = input.len() - 1;
+    input.truncate(new_len);
+
+    Ok(input)
 }
