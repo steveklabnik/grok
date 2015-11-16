@@ -48,7 +48,7 @@ fn main() {
 
     while let Ok(input) = fetch_line() {
         if input == "s" {
-            let operation = match codes.get(cpu.pc as usize) {
+            let operation = match codes.get(cpu.pc) {
                 Some(op) => *op,
                 None => break,
             };
@@ -56,7 +56,7 @@ fn main() {
         } else if input == "p" {
             println!("{:?}", cpu);
         } else if input == "c" {
-            while let Some(operation) = codes.get(cpu.pc as usize) {
+            while let Some(operation) = codes.get(cpu.pc) {
                 cpu.apply(*operation);
             }
             break;
