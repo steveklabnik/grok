@@ -31,7 +31,7 @@ fn main() {
     let mut registers = Registers { pc: 0, a: 0, b: 0, c: 0 };
 
     while let Ok(input) = fetch_input() {
-        if let Ok(operation) = parse_input(&input) {
+        if let Ok(operation) = parse_line(&input) {
             registers.apply(operation);
             println!("{:?}", registers);
         }
@@ -77,8 +77,8 @@ impl Registers {
     }
 }
 
-fn parse_input(input: &str) -> Result<Operation, ()> {
-    let parts: Vec<_> = input.split_whitespace().collect(); 
+fn parse_line(line: &str) -> Result<Operation, ()> {
+    let parts: Vec<_> = line.split_whitespace().collect(); 
 
     // i suck at parsing, so sorry
     let register = match parts[1] {
