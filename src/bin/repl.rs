@@ -4,9 +4,9 @@ use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
 
-mod cpu;
+extern crate grok;
 
-use cpu::Cpu;
+use grok::Cpu;
 
 fn main() {
     let filename = env::args().skip(1).next().unwrap_or(String::from("sample.asm"));
