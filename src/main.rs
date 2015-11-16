@@ -1,4 +1,5 @@
 use std::io;
+use std::io::prelude::*;
 
 #[derive(Debug)]
 struct Registers {
@@ -14,7 +15,9 @@ enum Register {
 }
 
 enum Operation {
-    Set(Register, u64)
+    Set(Register, u64),
+    Increment(Register),
+    Decrement(Register),
 }
 
 fn main() {
@@ -30,6 +33,20 @@ fn main() {
                         Register::C => registers.c = value,
                     }
                 },
+                Operation::Increment(register) => {
+                    match register {
+                        Register::A => registers.a += 1,
+                        Register::B => registers.b += 1,
+                        Register::C => registers.c += 1,
+                    }
+                },
+                Operation::Decrement(register) => {
+                    match register {
+                        Register::A => registers.a -= 1,
+                        Register::B => registers.b -= 1,
+                        Register::C => registers.c -= 1,
+                    }
+                },
             }
             println!("{:?}", registers);
         }
@@ -40,19 +57,24 @@ fn parse_input(input: &str) -> Result<Operation, ()> {
     let parts: Vec<_> = input.split_whitespace().collect(); 
 
     // i suck at parsing, so sorry
+    let register = match parts[1] {
+        "a" => Register::A,
+        "b" => Register::B,
+        "c" => Register::C,
+        _ => return Err(()), 
+    };
 
     if parts[0] == "set" {
-        let register = match parts[1] {
-            "a" => Register::A,
-            "b" => Register::B,
-            "c" => Register::C,
-            _ => return Err(()), 
-        };
         let value = match parts[2].parse() {
             Ok(value) => value,
             Err(_) => return Err(()),
         };
+
         Ok(Operation::Set(register, value))
+    } else if parts[0] == "increment" {
+        Ok(Operation::Increment(register))
+    } else if parts[0] == "decrement" {
+        Ok(Operation::Decrement(register))
     } else {
         Err(())
     }
@@ -61,6 +83,9 @@ fn parse_input(input: &str) -> Result<Operation, ()> {
 
 fn fetch_input() -> io::Result<String> {
     let mut input = String::new();
+
+    print!("> ");
+    io::stdout().flush();
 
     try!(io::stdin().read_line(&mut input));
 
