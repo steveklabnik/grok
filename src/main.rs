@@ -3,7 +3,7 @@ use std::io::prelude::*;
 use std::fs::File;
 
 #[derive(Debug)]
-struct Registers {
+struct Cpu {
     pc: u64,
     a: u64,
     b: u64,
@@ -29,7 +29,7 @@ enum Value {
 }
 
 fn main() {
-    let mut registers = Registers { pc: 0, a: 0, b: 0, c: 0 };
+    let mut cpu = Cpu { pc: 0, a: 0, b: 0, c: 0 };
     let mut codes: Vec<Operation> = Vec::new();
 
     let f = File::open("sample.asm").expect("Couldn't find file");
@@ -43,12 +43,12 @@ fn main() {
     }
 
     for operation in codes {
-        registers.apply(operation);
-            println!("{:?}", registers);
+        cpu.apply(operation);
+            println!("{:?}", cpu);
     }
 }
 
-impl Registers {
+impl Cpu {
     fn apply(&mut self, operation: Operation) {
         match operation {
             Operation::Set(register, value) => {
