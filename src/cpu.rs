@@ -37,7 +37,13 @@ pub enum Value {
 
 impl Cpu {
     pub fn new() -> Cpu {
-        Cpu { instructions: Vec::new(), pc: 0, a: 0, b: 0, c: 0 }
+        Cpu {
+            instructions: Vec::new(),
+            pc: 0,
+            a: 0,
+            b: 0,
+            c: 0,
+        }
     }
 
     pub fn load<T: io::Read>(&mut self, reader: BufReader<T>) {
@@ -76,13 +82,13 @@ impl Cpu {
                 };
 
                 *self.register_mut(register) = value;
-            },
+            }
             Instruction::Increment(register) => {
                 *self.register_mut(register) += 1;
-            },
+            }
             Instruction::Decrement(register) => {
                 *self.register_mut(register) -= 1;
-            },
+            }
         }
 
         self.pc += 1;
@@ -98,7 +104,7 @@ impl Cpu {
 }
 
 impl fmt::Display for Cpu {
-   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(writeln!(f, "Registers:"));
         try!(writeln!(f, "a:\t{}", self.a));
         try!(writeln!(f, "b:\t{}", self.b));
@@ -132,18 +138,17 @@ fn parse_line(line: &str) -> Result<Instruction, ()> {
                     };
 
                     Value::Register(register)
-                },
+                }
             };
 
             Ok(Instruction::Set(register, value))
-        },
+        }
         "increment" => {
             Ok(Instruction::Increment(register))
-        },
+        }
         "decrement" => {
             Ok(Instruction::Decrement(register))
-        },
-        _ => Err(())
+        }
+        _ => Err(()),
     }
 }
-
