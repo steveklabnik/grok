@@ -8,6 +8,7 @@ struct Registers {
     c: u64,
 }
 
+#[derive(Debug)]
 enum Register {
     A,
     B,
@@ -15,9 +16,14 @@ enum Register {
 }
 
 enum Operation {
-    Set(Register, u64),
+    Set(Register, Value),
     Increment(Register),
     Decrement(Register),
+}
+
+enum Value {
+    Immediate(u64),
+    Register(Register),
 }
 
 fn main() {
@@ -27,6 +33,15 @@ fn main() {
         if let Ok(operation) = parse_input(&input) {
             match operation {
                 Operation::Set(register, value) => {
+                    let value = match value {
+                        Value::Immediate(number) => number,
+                        Value::Register(register) => match register {
+                            Register::A => registers.a,
+                            Register::B => registers.b,
+                            Register::C => registers.c,
+                        }
+                    };
+
                     match register {
                         Register::A => registers.a = value,
                         Register::B => registers.b = value,
@@ -64,21 +79,32 @@ fn parse_input(input: &str) -> Result<Operation, ()> {
         _ => return Err(()), 
     };
 
-    if parts[0] == "set" {
-        let value = match parts[2].parse() {
-            Ok(value) => value,
-            Err(_) => return Err(()),
-        };
+    match parts[0] {
+        "set" => {
+            let value = match parts[2].parse() {
+                Ok(value) => Value::Immediate(value),
+                Err(_) => {
+                    let register = match parts[2] {
+                        "a" => Register::A,
+                        "b" => Register::B,
+                        "c" => Register::C,
+                        _ => return Err(()), 
+                    };
 
-        Ok(Operation::Set(register, value))
-    } else if parts[0] == "increment" {
-        Ok(Operation::Increment(register))
-    } else if parts[0] == "decrement" {
-        Ok(Operation::Decrement(register))
-    } else {
-        Err(())
+                    Value::Register(register)
+                },
+            };
+
+            Ok(Operation::Set(register, value))
+        },
+        "increment" => {
+            Ok(Operation::Increment(register))
+        },
+        "decrement" => {
+            Ok(Operation::Decrement(register))
+        },
+        _ => Err(())
     }
-
 }
 
 fn fetch_input() -> io::Result<String> {
