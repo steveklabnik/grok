@@ -5,7 +5,7 @@ use std::fs::File;
 
 #[derive(Debug)]
 struct Cpu {
-    pc: u64,
+    pc: usize, // lol
     a: u64,
     b: u64,
     c: u64,
