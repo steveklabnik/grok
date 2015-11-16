@@ -14,7 +14,7 @@ enum Register {
 }
 
 enum Operation {
-    Set(Register)
+    Set(Register, u64)
 }
 
 fn main() {
@@ -23,11 +23,11 @@ fn main() {
     while let Ok(input) = fetch_input() {
         if let Ok(operation) = parse_input(&input) {
             match operation {
-                Operation::Set(register) => {
+                Operation::Set(register, value) => {
                     match register {
-                        Register::A => registers.a = 5,
-                        Register::B => registers.b = 6,
-                        Register::C => registers.c = 7,
+                        Register::A => registers.a = value,
+                        Register::B => registers.b = value,
+                        Register::C => registers.c = value,
                     }
                 },
             }
@@ -42,12 +42,17 @@ fn parse_input(input: &str) -> Result<Operation, ()> {
     // i suck at parsing, so sorry
 
     if parts[0] == "set" {
-        match parts[1] {
-            "a" => Ok(Operation::Set(Register::A)),
-            "b" => Ok(Operation::Set(Register::B)),
-            "c" => Ok(Operation::Set(Register::C)),
-            _ => Err(()), 
-        }
+        let register = match parts[1] {
+            "a" => Register::A,
+            "b" => Register::B,
+            "c" => Register::C,
+            _ => return Err(()), 
+        };
+        let value = match parts[2].parse() {
+            Ok(value) => value,
+            Err(_) => return Err(()),
+        };
+        Ok(Operation::Set(register, value))
     } else {
         Err(())
     }
