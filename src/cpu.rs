@@ -110,8 +110,9 @@ impl fmt::Display for Cpu {
         try!(writeln!(f, "Registers:"));
         try!(writeln!(f, "a:\t{}", self.a));
         try!(writeln!(f, "b:\t{}", self.b));
+        try!(writeln!(f, "c:\t{}", self.b));
 
-        write!(f, "c:\t{}", self.c)
+        write!(f, "Program Counter:\t{}", self.pc)
     }
 }
 
