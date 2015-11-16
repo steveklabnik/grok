@@ -31,40 +31,44 @@ fn main() {
 
     while let Ok(input) = fetch_input() {
         if let Ok(operation) = parse_input(&input) {
-            match operation {
-                Operation::Set(register, value) => {
-                    let value = match value {
-                        Value::Immediate(number) => number,
-                        Value::Register(register) => match register {
-                            Register::A => registers.a,
-                            Register::B => registers.b,
-                            Register::C => registers.c,
-                        }
-                    };
-
-                    match register {
-                        Register::A => registers.a = value,
-                        Register::B => registers.b = value,
-                        Register::C => registers.c = value,
-                    }
-                },
-                Operation::Increment(register) => {
-                    match register {
-                        Register::A => registers.a += 1,
-                        Register::B => registers.b += 1,
-                        Register::C => registers.c += 1,
-                    }
-                },
-                Operation::Decrement(register) => {
-                    match register {
-                        Register::A => registers.a -= 1,
-                        Register::B => registers.b -= 1,
-                        Register::C => registers.c -= 1,
-                    }
-                },
-            }
+            execute(operation, &mut registers);
             println!("{:?}", registers);
         }
+    }
+}
+
+fn execute(operation: Operation, registers: &mut Registers) {
+    match operation {
+        Operation::Set(register, value) => {
+            let value = match value {
+                Value::Immediate(number) => number,
+                Value::Register(register) => match register {
+                    Register::A => registers.a,
+                    Register::B => registers.b,
+                    Register::C => registers.c,
+                }
+            };
+
+            match register {
+                Register::A => registers.a = value,
+                Register::B => registers.b = value,
+                Register::C => registers.c = value,
+            }
+        },
+        Operation::Increment(register) => {
+            match register {
+                Register::A => registers.a += 1,
+                Register::B => registers.b += 1,
+                Register::C => registers.c += 1,
+            }
+        },
+        Operation::Decrement(register) => {
+            match register {
+                Register::A => registers.a -= 1,
+                Register::B => registers.b -= 1,
+                Register::C => registers.c -= 1,
+            }
+        },
     }
 }
 
