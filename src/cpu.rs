@@ -46,13 +46,15 @@ impl Cpu {
         }
     }
 
-    pub fn load<T: io::Read>(&mut self, reader: BufReader<T>) {
+    pub fn load<T: io::Read>(&mut self, reader: BufReader<T>) -> io::Result<()> {
         for line in reader.lines() {
-            let line = line.unwrap();
+            let line = try!(line);
             if let Ok(instruction) = parse_line(&line) {
                 self.instructions.push(instruction);
             }
         }
+
+        Ok(())
     }
 
     pub fn finished(&self) -> bool {

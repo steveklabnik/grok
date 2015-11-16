@@ -15,7 +15,7 @@ fn main() {
     let reader = BufReader::new(f);
 
     let mut cpu = Cpu::new();
-    cpu.load(reader);
+    cpu.load(reader).expect("Couldn't load instructions");
 
     while let Ok(input) = fetch_line() {
         if input == "s" {
