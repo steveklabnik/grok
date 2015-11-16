@@ -2,6 +2,7 @@ use std::io;
 use std::io::BufReader;
 use std::io::prelude::*;
 use std::fs::File;
+use std::fmt;
 
 #[derive(Debug)]
 struct Cpu {
@@ -61,7 +62,8 @@ fn main() {
             break;
         }
     }
-    println!("Final state: {:?}", cpu);
+
+    println!("Final state:\n{}", cpu);
 }
 
 impl Cpu {
@@ -122,6 +124,16 @@ impl Cpu {
         }
         
         self.pc += 1;
+    }
+}
+
+impl fmt::Display for Cpu {
+   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        try!(writeln!(f, "Registers:"));
+        try!(writeln!(f, "a:\t{}", self.a));
+        try!(writeln!(f, "b:\t{}", self.b));
+
+        write!(f, "c:\t{}", self.c)
     }
 }
 
