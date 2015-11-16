@@ -20,7 +20,7 @@ enum Register {
 }
 
 #[derive(Copy,Clone)]
-enum Operation {
+enum Instruction {
     Set(Register, Value),
     Increment(Register),
     Decrement(Register),
@@ -34,30 +34,30 @@ enum Value {
 
 fn main() {
     let mut cpu = Cpu { pc: 0, a: 0, b: 0, c: 0 };
-    let mut codes: Vec<Operation> = Vec::new();
+    let mut codes: Vec<Instruction> = Vec::new();
 
     let f = File::open("sample.asm").expect("Couldn't find file");
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
         let line = line.unwrap();
-        if let Ok(operation) = parse_line(&line) {
-            codes.push(operation);
+        if let Ok(instruction) = parse_line(&line) {
+            codes.push(instruction);
         }
     }
 
     while let Ok(input) = fetch_line() {
         if input == "s" {
-            let operation = match codes.get(cpu.pc) {
+            let instruction = match codes.get(cpu.pc) {
                 Some(op) => *op,
                 None => break,
             };
-            cpu.apply(operation);
+            cpu.apply(instruction);
         } else if input == "p" {
             println!("{:?}", cpu);
         } else if input == "c" {
-            while let Some(operation) = codes.get(cpu.pc) {
-                cpu.apply(*operation);
+            while let Some(instruction) = codes.get(cpu.pc) {
+                cpu.apply(*instruction);
             }
             break;
         }
@@ -66,9 +66,9 @@ fn main() {
 }
 
 impl Cpu {
-    fn apply(&mut self, operation: Operation) {
-        match operation {
-            Operation::Set(register, value) => {
+    fn apply(&mut self, instruction: Instruction) {
+        match instruction {
+            Instruction::Set(register, value) => {
                 let value = match value {
                     Value::Immediate(number) => number,
                     Value::Register(register) => match register {
@@ -84,14 +84,14 @@ impl Cpu {
                     Register::C => self.c = value,
                 }
             },
-            Operation::Increment(register) => {
+            Instruction::Increment(register) => {
                 match register {
                     Register::A => self.a += 1,
                     Register::B => self.b += 1,
                     Register::C => self.c += 1,
                 }
             },
-            Operation::Decrement(register) => {
+            Instruction::Decrement(register) => {
                 match register {
                     Register::A => self.a -= 1,
                     Register::B => self.b -= 1,
@@ -104,7 +104,7 @@ impl Cpu {
     }
 }
 
-fn parse_line(line: &str) -> Result<Operation, ()> {
+fn parse_line(line: &str) -> Result<Instruction, ()> {
     let parts: Vec<_> = line.split_whitespace().collect(); 
 
     // i suck at parsing, so sorry
@@ -131,13 +131,13 @@ fn parse_line(line: &str) -> Result<Operation, ()> {
                 },
             };
 
-            Ok(Operation::Set(register, value))
+            Ok(Instruction::Set(register, value))
         },
         "increment" => {
-            Ok(Operation::Increment(register))
+            Ok(Instruction::Increment(register))
         },
         "decrement" => {
-            Ok(Operation::Decrement(register))
+            Ok(Instruction::Decrement(register))
         },
         _ => Err(())
     }
