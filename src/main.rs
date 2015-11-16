@@ -3,6 +3,7 @@ use std::io::prelude::*;
 
 #[derive(Debug)]
 struct Registers {
+    pc: u64,
     a: u64,
     b: u64,
     c: u64,
@@ -27,7 +28,7 @@ enum Value {
 }
 
 fn main() {
-    let mut registers = Registers { a: 0, b: 0, c: 0 };
+    let mut registers = Registers { pc: 0, a: 0, b: 0, c: 0 };
 
     while let Ok(input) = fetch_input() {
         if let Ok(operation) = parse_input(&input) {
@@ -71,6 +72,8 @@ impl Registers {
                 }
             },
         }
+        
+        self.pc += 1;
     }
 }
 
