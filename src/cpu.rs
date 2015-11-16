@@ -72,36 +72,28 @@ impl Cpu {
             Instruction::Set(register, value) => {
                 let value = match value {
                     Value::Immediate(number) => number,
-                    Value::Register(register) => match register {
-                        Register::A => self.a,
-                        Register::B => self.b,
-                        Register::C => self.c,
-                    }
+                    Value::Register(register) => *self.register_mut(register),
                 };
 
-                match register {
-                    Register::A => self.a = value,
-                    Register::B => self.b = value,
-                    Register::C => self.c = value,
-                }
+                *self.register_mut(register) = value;
             },
             Instruction::Increment(register) => {
-                match register {
-                    Register::A => self.a += 1,
-                    Register::B => self.b += 1,
-                    Register::C => self.c += 1,
-                }
+                *self.register_mut(register) += 1;
             },
             Instruction::Decrement(register) => {
-                match register {
-                    Register::A => self.a -= 1,
-                    Register::B => self.b -= 1,
-                    Register::C => self.c -= 1,
-                }
+                *self.register_mut(register) -= 1;
             },
         }
 
         self.pc += 1;
+    }
+
+    fn register_mut(&mut self, register: Register) -> &mut u64 {
+        match register {
+            Register::A => &mut self.a,
+            Register::B => &mut self.b,
+            Register::C => &mut self.c,
+        }
     }
 }
 
