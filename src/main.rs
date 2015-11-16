@@ -34,7 +34,7 @@ enum Value {
 
 fn main() {
     let mut cpu = Cpu { pc: 0, a: 0, b: 0, c: 0 };
-    let mut codes: Vec<Instruction> = Vec::new();
+    let mut codes = Vec::new();
 
     let f = File::open("sample.asm").expect("Couldn't find file");
     let reader = BufReader::new(f);
