@@ -85,7 +85,7 @@ fn fetch_input() -> io::Result<String> {
     let mut input = String::new();
 
     print!("> ");
-    io::stdout().flush();
+    try!(io::stdout().flush());
 
     try!(io::stdin().read_line(&mut input));
 
