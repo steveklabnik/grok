@@ -5,6 +5,7 @@ use std::fs::File;
 
 #[derive(Debug)]
 struct Cpu {
+    instructions: Vec<Instruction>,
     pc: usize, // lol
     a: u64,
     b: u64,
@@ -19,6 +20,7 @@ enum Register {
     C,
 }
 
+#[derive(Debug)]
 #[derive(Copy,Clone)]
 enum Instruction {
     Set(Register, Value),
@@ -26,6 +28,7 @@ enum Instruction {
     Decrement(Register),
 }
 
+#[derive(Debug)]
 #[derive(Copy,Clone)]
 enum Value {
     Immediate(u64),
@@ -33,8 +36,7 @@ enum Value {
 }
 
 fn main() {
-    let mut cpu = Cpu { pc: 0, a: 0, b: 0, c: 0 };
-    let mut codes = Vec::new();
+    let mut cpu = Cpu::new();
 
     let f = File::open("sample.asm").expect("Couldn't find file");
     let reader = BufReader::new(f);
@@ -42,23 +44,20 @@ fn main() {
     for line in reader.lines() {
         let line = line.unwrap();
         if let Ok(instruction) = parse_line(&line) {
-            codes.push(instruction);
+            cpu.instructions.push(instruction);
         }
     }
 
     while let Ok(input) = fetch_line() {
         if input == "s" {
-            let instruction = match codes.get(cpu.pc) {
-                Some(op) => *op,
-                None => break,
-            };
-            cpu.apply(instruction);
+            cpu.step();
+        } else if input == "c" {
+            cpu.run();
         } else if input == "p" {
             println!("{:?}", cpu);
-        } else if input == "c" {
-            while let Some(instruction) = codes.get(cpu.pc) {
-                cpu.apply(*instruction);
-            }
+        }
+
+        if cpu.finished() {
             break;
         }
     }
@@ -66,8 +65,30 @@ fn main() {
 }
 
 impl Cpu {
-    fn apply(&mut self, instruction: Instruction) {
-        match instruction {
+    fn new() -> Cpu {
+        Cpu { instructions: Vec::new(), pc: 0, a: 0, b: 0, c: 0 }
+    }
+
+    fn finished(&self) -> bool {
+        self.pc >= self.instructions.len()
+    }
+
+    fn run(&mut self) {
+        loop {
+            if !self.finished() {
+                self.step();
+            } else {
+                break;
+            }
+        }
+    }
+
+    fn step(&mut self) {
+        if self.finished() {
+            return;
+        }
+
+        match self.instructions[self.pc] {
             Instruction::Set(register, value) => {
                 let value = match value {
                     Value::Immediate(number) => number,
