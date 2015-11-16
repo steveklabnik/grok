@@ -1,0 +1,4 @@
+[package]
+name = "grok"
+version = "0.1.0"
+authors = ["Steve Klabnik <steve@steveklabnik.com>"]
