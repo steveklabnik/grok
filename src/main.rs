@@ -49,12 +49,16 @@ fn main() {
     while let Ok(input) = fetch_line() {
         if input == "s" {
             let pc = cpu.pc;
-            let operation = codes[pc as usize];
+            let operation = match codes.get(pc as usize) {
+                Some(op) => *op,
+                None => break,
+            };
             cpu.apply(operation);
         } else if input == "p" {
             println!("{:?}", cpu);
         }
     }
+    println!("Final state: {:?}", cpu);
 }
 
 impl Cpu {
